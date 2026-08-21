@@ -1,8 +1,20 @@
+from src.core.baseline import finding_fingerprint
+
+
 class AIEngine:
-    def __init__(self, config, logger): self.config, self.logger = config, logger
+    """Deterministic finding correlation baseline.
+
+    The class keeps the historical name for API compatibility. It does not claim
+    ML behavior when no model is configured.
+    """
+
+    def __init__(self, config, logger):
+        self.config, self.logger = config, logger
+
     def analyze_findings(self, findings):
-        seen=set(); out=[]
-        for f in findings:
-            key=(f.get("host"),f.get("port"),f.get("title"))
-            if key not in seen: seen.add(key); out.append(f)
-        return out
+        correlated = {}
+        for finding in findings:
+            item = dict(finding)
+            item.setdefault("fingerprint", finding_fingerprint(item))
+            correlated[item["fingerprint"]] = item
+        return list(correlated.values())
