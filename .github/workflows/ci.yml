@@ -15,4 +15,5 @@ jobs:
       - run: python -m pip install --upgrade pip
       - run: pip install -r requirements.txt
       - run: python -m compileall -q hobbit.py src tests
+      - run: python hobbit.py --help
       - run: python -m pytest -q

@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field
 import redis.asyncio as redis
 from celery import Celery
 
-app=FastAPI(title="Hobbit-NG API",version="3.0.0")
+app=FastAPI(title="Hobbit-NG API",version="3.1.0")
 security=HTTPBearer()
 REDIS_URL=os.getenv("REDIS_URL","redis://localhost:6379/0")
 JWT_SECRET=os.getenv("JWT_SECRET","")
@@ -68,6 +68,15 @@ async def status(scan_id:str,auth:Dict=Depends(verify_token)):
     if scan.get("tenant_id")!=auth["user"]["tenant_id"]: raise HTTPException(status_code=403,detail="Access denied")
     return scan
 
+@app.get("/scans/{scan_id}/results")
+async def results(scan_id:str,auth:Dict=Depends(verify_token)):
+    raw=await redis_client.get(f"scan:{scan_id}")
+    if not raw: raise HTTPException(status_code=404,detail="Scan not found")
+    scan=json.loads(raw)
+    if scan.get("tenant_id")!=auth["user"]["tenant_id"]: raise HTTPException(status_code=403,detail="Access denied")
+    if scan.get("status")!="completed": raise HTTPException(status_code=409,detail=f"Scan is {scan.get('status','unknown')}")
+    return scan.get("report",{})
+
 @app.post("/remediate")
 async def remediate(request:RemediationRequest,auth:Dict=Depends(verify_token)):
     if not request.dry_run: raise HTTPException(status_code=403,detail="Automatic remediation execution is disabled in the baseline build")
@@ -86,4 +95,4 @@ async def ws(websocket:WebSocket,scan_id:str):
 async def health():
     try: redis_ok=bool(await redis_client.ping())
     except Exception: redis_ok=False
-    return {"status":"healthy" if redis_ok else "degraded","version":"3.0.0","components":{"redis":redis_ok,"worker":"external"}}
+    return {"status":"healthy" if redis_ok else "degraded","version":"3.1.0","components":{"redis":redis_ok,"worker":"external"}}

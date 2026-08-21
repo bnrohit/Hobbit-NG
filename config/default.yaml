@@ -6,7 +6,16 @@ scanning:
   max_concurrent_tasks: 256
   max_hosts_parallel: 64
   max_hosts_per_target: 4096
+  max_total_hosts: 8192
   retry_count: 1
+
+target_policy:
+  # Turn this on in production to require all active scan targets to be explicitly in scope.
+  enforce_allowlist: false
+  allowed_networks: []
+  denied_networks: []
+  allowed_hostnames: []
+  denied_hostnames: []
 
 ai:
   exploration_rate: 0.1
