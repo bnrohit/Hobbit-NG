@@ -48,5 +48,13 @@ remediation:
 compliance:
   frameworks: ["NIST-800-53", "SOC-2", "PCI-DSS", "HIPAA", "GDPR"]
 
+support:
+  # Donations are optional and never gate any Hobbit-NG feature.
+  enabled: true
+  provider: "stripe"
+  donation_url_env: "HOBBIT_DONATION_URL"
+  interactive_prompt: true
+  message: "Hobbit-NG is free and open source. If it helps you, an optional donation can support continued development, testing, documentation, and maintenance."
+
 logging:
   level: "INFO"
