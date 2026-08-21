@@ -9,6 +9,8 @@ services:
       JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET}
       HOBBIT_DEV_AUTH: ${HOBBIT_DEV_AUTH:-0}
       HOBBIT_DEV_ADMIN_PASSWORD: ${HOBBIT_DEV_ADMIN_PASSWORD:-}
+      # Public Stripe-hosted Payment Link only. Leave blank to disable support metadata/link.
+      HOBBIT_DONATION_URL: ${HOBBIT_DONATION_URL:-}
     depends_on: [redis]
     networks: [hobbit-net]
   celery-worker:
