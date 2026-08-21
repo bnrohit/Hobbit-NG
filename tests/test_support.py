@@ -46,3 +46,12 @@ def test_prompt_never_blocks_noninteractive_runs():
     env = {"HOBBIT_DONATION_URL": "https://donate.stripe.com/example"}
     result = maybe_prompt_support(CONFIG, environ=env, interactive=False)
     assert result == "skipped_noninteractive"
+
+
+def test_support_can_be_disabled_completely():
+    config = {"support": {"enabled": False}}
+    env = {"HOBBIT_DONATION_URL": "https://donate.stripe.com/example"}
+    info = support_info(config, env)
+    assert info["configured"] is False
+    assert info["donation_url"] is None
+    assert maybe_prompt_support(config, environ=env, interactive=True) == "disabled"
