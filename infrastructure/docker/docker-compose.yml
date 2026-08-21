@@ -1,0 +1,30 @@
+services:
+  hobbit-api:
+    build:
+      context: ../..
+      dockerfile: infrastructure/docker/Dockerfile
+    ports: ["8000:8000"]
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET}
+      HOBBIT_DEV_AUTH: ${HOBBIT_DEV_AUTH:-0}
+      HOBBIT_DEV_ADMIN_PASSWORD: ${HOBBIT_DEV_ADMIN_PASSWORD:-}
+    depends_on: [redis]
+    networks: [hobbit-net]
+  celery-worker:
+    build:
+      context: ../..
+      dockerfile: infrastructure/docker/Dockerfile.worker
+    environment:
+      REDIS_URL: redis://redis:6379/0
+    depends_on: [redis]
+    networks: [hobbit-net]
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server","--appendonly","yes"]
+    volumes: ["redis-data:/data"]
+    networks: [hobbit-net]
+volumes:
+  redis-data: {}
+networks:
+  hobbit-net: {driver: bridge}
